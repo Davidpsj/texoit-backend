@@ -1,0 +1,15 @@
+# Default configs to editor.
+# Author: David Júnior <davidpsjunior@gmail.com>
+# Created: 2021-06-18
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.{js,vue}]
+charset = utf-8
+
+[*.{js,vue}]
+indent_style = space
+indent_size = 2

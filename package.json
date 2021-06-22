@@ -1,0 +1,29 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon dist/index.ts",
+		"dev:debug": "nodemon --inspect --trace-warnings src/index.ts"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "reflect-metadata": "^0.1.10",
+    "sqlite3": "^5.0.2",
+    "typeorm": "0.2.34"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.12",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^8.0.29",
+    "@types/sqlite3": "^3.1.7",
+    "jest": "^27.0.4",
+    "nodemon": "^2.0.7",
+    "ts-jest": "^27.0.3",
+    "ts-node": "3.3.0",
+    "typescript": "3.9.10"
+  }
+}
