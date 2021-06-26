@@ -3,7 +3,7 @@
   "type": "sqlite",
   "database": "./data/database.sqlite3",
   "synchronize": false,
-  "logging": false,
+  "logging": true,
   "entities": ["src/entity/**/*.ts"],
   "migrations": ["src/migration/**/*.ts"],
   "subscribers": ["src/subscriber/**/*.ts"],

@@ -1,6 +1,8 @@
 import fs from 'fs';
 import { getRepository } from 'typeorm';
 import { Movies } from '../entity/Movies';
+import { Producers } from '../entity/Producers';
+import { Prizes } from '../entity/Prizes';
 
 /**
  * Interface IMovie that references the data structure of CSV to import.
@@ -30,9 +32,11 @@ export const readCsvFile = function* (filename: string): Generator {
 
 		// Iterate lines and extract fields to IMovie interface data.
 		for (let line of lines) {
+			console.log('line', line);
 			const [year, title, studios, producers, winner] = line.split(';');
-			// Return the IMovie line extracted
-			yield { year: parseInt(year), title, studios, producers, winner: winner === 'yes' } as IMovie;
+
+			if(line !== '')
+				yield { year: parseInt(year), title, studios, producers, winner: winner === 'yes' } as IMovie;
 		}
 
 		return true;
@@ -44,36 +48,111 @@ export const readCsvFile = function* (filename: string): Generator {
 export const insertData = async (filename: string): Promise<number> => {
 	let line: any;
 	let count: number = 0;
+	let prize: Prizes | undefined;
+	let movie: Movies | undefined;
+	let res: any;
+
+	// Get file line from generator.
 	const movieData = readCsvFile(filename);
 
-  let query: any;
-  while (!(line = movieData.next()).done) {
-    const { year, title, studios, producers, winner } = line.value;
+	try {
 
-    if (year && title) {
-      query = await getRepository(Movies, 'default').findOne({
-        where: {
-          year: year,
-          title: title,
-          studios: studios,
-          producers: producers,
-          winner: winner,
-        },
-      });
+		while (!(line = movieData.next()).done) {
+      const { year, title, studios, producers, winner } = line.value;
 
-      if (query === undefined) {
-        const inserted = await getRepository(Movies, 'default').save({
-          year: year,
-          title: title,
-          studios: studios,
-          producers: producers,
-          winner: winner,
-        });
+      // Producers lines
+      const prodNames = producers.split(/,\s|and\s|\sand\s/).filter((i: any) => i !== '');
 
-        count++;
+      // Check if the current line movie is present in the database.
+      const exists: Movies[] = await getRepository(Movies).find({ title });
+
+      // Create a instance of Movies
+      movie = new Movies();
+      movie.title = title;
+      movie.studios = studios;
+      // Put on it all producers.
+      movie.producers = [...prodNames.map((prod: string): Producers => ({ name: prod } as Producers))];
+
+      // If exists and returned data is an array zero-length.
+      if (exists && Array.isArray(exists) && exists.length === 0) {
+        // If movie is winner
+        if (winner) {
+          // Check if the year prize is present.
+          prize = await getRepository(Prizes)
+            .createQueryBuilder('prize')
+            .where('prize.year = :year', { year })
+            .getOne();
+
+          // If prizeData is present
+          if (prize !== undefined) {
+            movie.prizes = prize;
+          } else {
+            prize = new Prizes();
+            prize.year = year;
+            // prize.movies = [movie]
+            // prize.movies
+            prize = await getRepository(Prizes).save(prize);
+            movie.prizes = prize;
+          }
+
+          // Send Movie data to database.
+          res = await getRepository(Movies).save(movie);
+
+          if (res) {
+            // Increment count
+						count++;
+						res = null;
+          }
+				} else {
+					res = await getRepository(Movies).save(movie);
+					// Increment count
+					count++;
+					res = null;
+        }
+
+        // console.log('WINNER TRUE --- ', winner);
+        // let prize: Prizes = null;
+        // prize = await getRepository(Prizes).createQueryBuilder().where('year = :year', { year }).getOne();
+        // console.log('PRIZE --- ', prize);
+        // if (prize) {
+        // 	prize.movies = [res];
+        // 	await getRepository(Prizes).save(prize);
+        // } else {
+        // 	prize = new Prizes();
+        // 	prize.year = year;
+        // 	prize.movies = [res];
+        // 	console.log('PRIZE UPDATING --- ', prize);
+        // 	await getRepository(Prizes).save(prize);
+        // }
       }
+
+      // if (year && title) {
+      //   query = await getRepository(Movies, 'default').findOne({
+      //     where: {
+      //       year: year,
+      //       title: title,
+      //       studios: studios,
+      //       producers: producers,
+      //       winner: winner,
+      //     },
+      //   });
+
+      //   if (query === undefined) {
+      //     const inserted = await getRepository(Movies, 'default').save({
+      //       year: year,
+      //       title: title,
+      //       studios: studios,
+      //       producers: producers,
+      //       winner: winner,
+      //     });
+
+      //     count++;
+      //   }
+      // }
     }
-  }
+	} catch (e) {
+		console.log(e);
+	}
 
   return count;
 }
