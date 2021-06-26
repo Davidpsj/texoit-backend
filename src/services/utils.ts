@@ -32,7 +32,6 @@ export const readCsvFile = function* (filename: string): Generator {
 
 		// Iterate lines and extract fields to IMovie interface data.
 		for (let line of lines) {
-			console.log('line', line);
 			const [year, title, studios, producers, winner] = line.split(';');
 
 			if(line !== '')
@@ -112,7 +111,7 @@ export const insertData = async (filename: string): Promise<number> => {
       }
     }
 	} catch (e) {
-		console.log(e);
+		console.error(e);
 	}
 
   return count;
