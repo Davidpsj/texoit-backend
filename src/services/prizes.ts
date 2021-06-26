@@ -1,19 +1,7 @@
 import { getRepository } from 'typeorm';
 import { Movies } from '../entity/Movies';
 
-export interface PrizeResults extends Array<PrizeResults> {
-  producer: string;
-  interval: number;
-  previousWin: number;
-  followingWin: number;
-}
-
-export const getPrizesByWinner = async (): Promise<PrizeResults> => {
-  try {
-		let producers: PrizeResults = [] as PrizeResults;
-		
-		producers = await getRepository(Movies)
-      .query(`SELECT t3.producer, t3.min as previousWin, t3.max as followingWin, (t3.max - t3.min) as interval FROM
+export const sqlQuery = `SELECT t3.producer, t3.min as previousWin, t3.max as followingWin, (t3.max - t3.min) as interval FROM
         (
             SELECT t2.producer, min(t2.year) as min, max(t2.year) as max FROM 
             (
@@ -29,10 +17,14 @@ export const getPrizesByWinner = async (): Promise<PrizeResults> => {
             ) as t2
             GROUP BY t2.producer
         ) as t3
-        WHERE interval > 0 ORDER BY interval`) as PrizeResults;
+        WHERE interval > 0 ORDER BY interval`;
 
-    return producers;
-  } catch (e) {
-    console.error(e);
-  }
+export interface PrizeResults extends Array<PrizeResults> {
+  producer: string;
+  interval: number;
+  previousWin: number;
+  followingWin: number;
 };
+
+export const getPrizesByWinner = async (): Promise<PrizeResults> =>
+  (await getRepository(Movies).query(sqlQuery)) as PrizeResults;

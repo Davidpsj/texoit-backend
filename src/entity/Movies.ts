@@ -4,14 +4,6 @@ import { Prizes } from './Prizes';
 
 @Entity()
 export class Movies {
-
-	// @PrimaryGeneratedColumn()
-	// id: number;
-
-	// @Column()
-	// year: number;
-
-	// @Column({ unique: true })
 	@PrimaryColumn()
 	title: string;
 
@@ -24,10 +16,4 @@ export class Movies {
 
 	@ManyToOne(() => Prizes, prize => prize.movies, { eager: true })
 	prizes?: Prizes;
-	
-	// @Column()
-	// producers: string;
-	
-	// @Column()
-	// winner: boolean;
 }
