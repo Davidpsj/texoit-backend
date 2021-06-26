@@ -109,46 +109,7 @@ export const insertData = async (filename: string): Promise<number> => {
 					count++;
 					res = null;
         }
-
-        // console.log('WINNER TRUE --- ', winner);
-        // let prize: Prizes = null;
-        // prize = await getRepository(Prizes).createQueryBuilder().where('year = :year', { year }).getOne();
-        // console.log('PRIZE --- ', prize);
-        // if (prize) {
-        // 	prize.movies = [res];
-        // 	await getRepository(Prizes).save(prize);
-        // } else {
-        // 	prize = new Prizes();
-        // 	prize.year = year;
-        // 	prize.movies = [res];
-        // 	console.log('PRIZE UPDATING --- ', prize);
-        // 	await getRepository(Prizes).save(prize);
-        // }
       }
-
-      // if (year && title) {
-      //   query = await getRepository(Movies, 'default').findOne({
-      //     where: {
-      //       year: year,
-      //       title: title,
-      //       studios: studios,
-      //       producers: producers,
-      //       winner: winner,
-      //     },
-      //   });
-
-      //   if (query === undefined) {
-      //     const inserted = await getRepository(Movies, 'default').save({
-      //       year: year,
-      //       title: title,
-      //       studios: studios,
-      //       producers: producers,
-      //       winner: winner,
-      //     });
-
-      //     count++;
-      //   }
-      // }
     }
 	} catch (e) {
 		console.log(e);
