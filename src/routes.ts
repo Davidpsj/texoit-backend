@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import { getDefaultAction } from './controller/GetDefaultAction';
 import { getPrizeIntervals } from './controller/GetPrizeIntervals';
 
